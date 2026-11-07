@@ -1,5 +1,5 @@
 // Definimos la versión actual de la app. Cambiar esto (ej: "v2") permite actualizar los archivos en los celulares.
-const VERSION = "v1";
+const VERSION = "v2";
 
 // Lista con todos los archivos esenciales que la app necesita para funcionar sin internet.
 const ARCHIVOS = [

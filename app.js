@@ -356,13 +356,25 @@ document.getElementById("input-importar").addEventListener("change", (e) => {
     lector.readAsText(archivo);
 });
 
-// --- FUNCIONES PWA (Service Worker y Aviso Offline - Práctico 11) ---
+// --- FUNCIONES PWA (Service Worker, Aviso Offline y Notificación de Actualización) ---
 function inicializarPWA() {
-    // 1. Registro del Service Worker
+    // 1. Registro del Service Worker y detección de nueva versión
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+                .then(reg => {
+                    console.log('Service Worker registrado con éxito:', reg.scope);
+                    
+                    // Detectar si hay un nuevo service worker instalándose/esperando
+                    reg.addEventListener('updatefound', () => {
+                        const nuevoWorker = reg.installing;
+                        nuevoWorker.addEventListener('statechange', () => {
+                            if (nuevoWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                mostrarAvisoActualizacion();
+                            }
+                        });
+                    });
+                })
                 .catch(err => console.error('Error al registrar el Service Worker:', err));
         });
     }
@@ -385,4 +397,13 @@ function inicializarPWA() {
     window.addEventListener('online', actualizarEstadoConexion);
     window.addEventListener('offline', actualizarEstadoConexion);
     actualizarEstadoConexion();
-}mostrarCursos();
+}
+
+// 3. Función para mostrar el mensaje flotante de actualización
+function mostrarAvisoActualizacion() {
+    const bannerActualizacion = document.createElement('div');
+    bannerActualizacion.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#27ae60; color:white; padding:12px 20px; border-radius:8px; font-weight:bold; z-index:10000; box-shadow:0 4px 6px rgba(0,0,0,0.2); font-family:sans-serif; text-align:center;';
+    bannerActualizacion.textContent = 'Hay una versión nueva: cerrá y volvé a abrir la app';
+    document.body.appendChild(bannerActualizacion);
+}
+```[cite: 15, 16]

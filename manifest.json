@@ -1,6 +1,6 @@
 {
-  "name": "Aula Virtual - 6.º Año",
-  "short_name": "Aula 6.º",
+  "name": "Aula Virtual - Biologia",
+  "short_name": "Bio",
   "description": "Aplicación web progresiva de aula virtual para escuela técnica",
   "start_url": "./",
   "scope": "./",
