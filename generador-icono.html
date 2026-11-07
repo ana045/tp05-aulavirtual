@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Íconos - Aula Virtual</title>
+    <style>
+        :root {
+            --color-principal: #D6457C;
+            --color-fondo: #F9F9FB;
+            --color-tarjeta: #FFFFFF;
+            --color-texto: #333333;
+            --color-borde: #E0E0E0;
+        }
+
+        body {
+            font-family: "Inter", system-ui, sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: "Poppins", system-ui, sans-serif;
+            color: var(--color-principal);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        p.subtitulo {
+            color: #666;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .contenedor-principal {
+            background-color: var(--color-tarjeta);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--color-borde);
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+        }
+
+        .grupo-control {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-family: "Poppins", system-ui, sans-serif;
+        }
+
+        input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-borde);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        input[type="color"] {
+            height: 44px;
+            cursor: pointer;
+        }
+
+        .vistas-previas {
+            display: flex;
+            justify-content: space-around;
+            gap: 1.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .caja-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Estilo visual redondeado para las vistas previas */
+        .caja-preview canvas {
+            border-radius: 22%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            background: white;
+        }
+
+        .botones-accion {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--color-principal);
+            color: white;
+            border: none;
+            min-height: 44px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-family: "Poppins", system-ui, sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #9B51E0;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generador de Íconos PWA</h1>
+    <p class="subtitulo">Crea y descarga los íconos de tu aplicación con un margen de seguridad del 10%.</p>
+
+    <div class="contenedor-principal">
+        <!-- Controles para emoji y color -->
+        <div class="grupo-control">
+            <label for="input-emoji">Emoji del ícono:</label>
+            <input type="text" id="input-emoji" value="📚" maxlength="2">
+        </div>
+
+        <div class="grupo-control">
+            <label for="input-color">Color de fondo:</label>
+            <input type="color" id="input-color" value="#D6457C">
+        </div>
+
+        <!-- Vistas previas en vivo -->
+        <div class="vistas-previas">
+            <div class="caja-preview">
+                <canvas id="canvas-192" width="192" height="192" style="width: 96px; height: 96px;"></canvas>
+                <small>192 x 192 px</small>
+            </div>
+            <div class="caja-preview">
+                <canvas id="canvas-512" width="512" height="512" style="width: 128px; height: 128px;"></canvas>
+                <small>512 x 512 px</small>
+            </div>
+        </div>
+
+        <!-- Botones de descarga -->
+        <div class="botones-accion">
+            <button id="btn-192">Descargar icono-192.png</button>
+            <button id="btn-512">Descargar icono-512.png</button>
+        </div>
+    </div>
+
+    <script>
+        const inputEmoji = document.getElementById("input-emoji");
+        const inputColor = document.getElementById("input-color");
+        
+        const canvas192 = document.getElementById("canvas-192");
+        const canvas512 = document.getElementById("canvas-512");
+
+        function dibujarIcono(canvas, emoji, colorFondo) {
+            const ctx = canvas.getContext("2d");
+            const tamaño = canvas.width;
+
+            // 1. Limpiar canvas y dibujar fondo con esquinas redondeadas (22% de radio)
+            ctx.clearRect(0, 0, tamaño, tamaño);
+            
+            const radioEsquina = tamaño * 0.22;
+            ctx.fillStyle = colorFondo;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, tamaño, tamaño, radioEsquina);
+            ctx.fill();
+
+            // 2. Calcular margen de seguridad del 10% y tamaño de fuente proporcional
+            const margenSeguridad = tamaño * 0.10;
+            const tamañoUtil = tamaño - (margenSeguridad * 2);
+            
+            ctx.font = `${tamañoUtil * 0.7}px sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            // 3. Dibujar emoji centrado
+            ctx.fillText(emoji, tamaño / 2, tamaño / 2 + (tamaño * 0.03));
+        }
+
+        function actualizarVistasPrevias() {
+            const emoji = inputEmoji.value || "📚";
+            const color = inputColor.value;
+
+            dibujarIcono(canvas192, emoji, color);
+            dibujarIcono(canvas512, emoji, color);
+        }
+
+        // Eventos en vivo
+        inputEmoji.addEventListener("input", actualizarVistasPrevias);
+        inputColor.addEventListener("input", actualizarVistasPrevias);
+
+        // Función de descarga usando toDataURL
+        function descargarCanvas(canvas, nombreArchivo) {
+            const enlace = document.createElement("a");
+            enlace.download = nombreArchivo;
+            enlace.href = canvas.toDataURL("image/png");
+            enlace.click();
+        }
+
+        document.getElementById("btn-192").addEventListener("click", () => {
+            descargarCanvas(canvas192, "icono-192.png");
+        });
+
+        document.getElementById("btn-512").addEventListener("click", () => {
+            descargarCanvas(canvas512, "icono-512.png");
+        });
+
+        // Dibujo inicial al cargar la página
+        actualizarVistasPrevias();
+    </script>
+</body>
+</html>

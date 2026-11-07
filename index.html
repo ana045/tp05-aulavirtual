@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula Virtual - 6.º Año</title>
+    <!-- Enlazamos la hoja de estilos CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Enlace al manifest y metadatos para la PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#D6457C">
+    <link rel="apple-touch-icon" href="icono-192.png">
+</head>
+<body>
+
+    <!-- Encabezado principal de la aplicación -->
+    <header>
+        <h1>Aula 6.º</h1>
+        <div>
+            <!-- Selector para alternar entre la vista de docente y alumno -->
+            <label for="selector-rol">Ver como:</label>
+            <select id="selector-rol">
+                <option value="docente">Docente</option>
+                <option value="alumno">Alumno</option>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <!-- Vista 1: Mis Cursos (Grilla y formulario de creación) -->
+        <section id="vista-mis-cursos">
+            <h2>Mis Cursos</h2>
+            
+            <!-- Formulario para crear un nuevo curso (Solo visible para docentes) -->
+            <form id="formulario-curso" class="solo-docente">
+                <input type="text" id="codigo-curso" placeholder="Código (ej: PRG6)" required>
+                <input type="text" id="nombre-curso" placeholder="Nombre del curso" required>
+                <input type="text" id="docente-curso" placeholder="Nombre del docente" required>
+                
+                <label for="color-curso" style="display: block; margin-top: 5px; font-weight: bold;">Color identificatorio:</label>
+                <input type="color" id="color-curso" value="#D6457C" style="height: 40px; padding: 2px; cursor: pointer;">
+                
+                <button type="submit" id="btn-guardar-curso">Crear Curso</button>
+                <div id="error-curso" style="color: red; margin-top: 5px; font-size: 0.9rem;"></div>
+            </form>
+
+            <!-- Contenedor para la grilla de tarjetas de cursos -->
+            <div id="contenedor-cursos"></div>
+        </section>
+
+        <!-- Vista 2: Curso (Muro con publicaciones y formulario) -->
+        <section id="vista-curso" style="display: none;">
+            <button id="btn-volver-cursos" style="background-color: #6c757d; margin-bottom: 1.5rem; display: inline-block;">⬅ Volver a Mis Cursos</button>
+            
+            <h2>Muro del Curso</h2>
+            
+            <!-- Formulario para publicar material o tarea (Solo visible para docentes) -->
+            <form id="formulario-publicacion" class="solo-docente">
+                <input type="text" id="titulo-publicacion" placeholder="Título" required>
+                <textarea id="consigna-publicacion" placeholder="Consigna o contenido" required></textarea>
+                
+                <label for="tipo-publicacion" style="font-weight: bold;">Tipo de publicación:</label>
+                <select id="tipo-publicacion">
+                    <option value="texto">Texto</option>
+                    <option value="enlace">Enlace</option>
+                    <option value="archivo">Archivo</option>
+                    <option value="tarea">📌 Tarea / TP</option>
+                </select>
+
+                <div id="contenedor-fecha-limite" style="margin-bottom: 1rem;">
+                    <label for="fecha-limite" style="font-size: 0.85rem; display: block;">Fecha límite (si es una Tarea):</label>
+                    <input type="datetime-local" id="fecha-limite" style="margin-bottom: 0.5rem;">
+                    
+                    <label for="puntaje-maximo" style="font-size: 0.85rem; display: block;">Puntaje máximo:</label>
+                    <input type="number" id="puntaje-maximo" value="10" min="1" max="100" inputmode="numeric">
+                </div>
+                
+                <button type="submit">Publicar</button>
+            </form>
+
+            <!-- Lista para las publicaciones y tareas del muro -->
+            <div id="lista-muro"></div>
+        </section>
+
+        <!-- Vista 3: Detalle de Tarea y entregas -->
+        <section id="vista-tarea" style="display: none;">
+            <button id="btn-volver-muro" style="background-color: #6c757d; margin-bottom: 1.5rem; display: inline-block;">⬅ Volver al Muro</button>
+
+            <!-- Detalle de la consigna de la tarea -->
+            <div id="detalles-tarea" style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <!-- Se completa automáticamente desde JS -->
+            </div>
+
+            <!-- Formulario de búsqueda o filtro para alumnos (Vista Alumno) -->
+            <div id="panel-consulta-alumno" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
+                <h3>Consultar mis notas y entregas</h3>
+                <input type="text" id="nombre-consulta-alumno" placeholder="Ingresa tu Nombre y Apellido exacto" style="width: 100%; margin-bottom: 0.5rem;">
+                <button id="btn-consultar-notas" style="background-color: #2980B9; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Ver mis calificaciones</button>
+            </div>
+
+            <!-- Formulario de entrega (Vista Alumno) -->
+            <form id="formulario-entrega" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1.5rem;">
+                <h3>Realizar Entrega</h3>
+                
+                <input type="text" id="nombre-alumno-entrega" placeholder="Tu Nombre y Apellido" required>
+                
+                <label for="tipo-entrega" style="font-weight: bold; display: block; margin-top: 10px;">Formato de entrega:</label>
+                <select id="tipo-entrega">
+                    <option value="texto">Texto escrito</option>
+                    <option value="enlace">Enlace (URL)</option>
+                    <option value="archivo">Adjuntar Archivo</option>
+                </select>
+
+                <div id="contenedor-input-entrega" style="margin-top: 10px;">
+                    <textarea id="contenido-entrega-texto" placeholder="Escribe tu respuesta aquí..." required style="width:100%; height:100px; padding:0.75rem; border:1px solid #ccc; border-radius:8px; font-family:inherit; box-sizing:border-box;"></textarea>
+                </div>
+                
+                <button type="submit" id="btn-enviar-entrega" style="background-color: #27AE60; margin-top: 10px;">Entregar Tarea</button>
+            </form>
+
+            <!-- Contenedor general para la lista de entregas y calificaciones -->
+            <div id="lista-entregas"></div>
+        </section>
+    </main>
+
+    <!-- Pie de página con botones de Exportar e Importar -->
+    <footer>
+        <button id="boton-exportar">Exportar JSON</button>
+        <button id="boton-importar">Importar JSON</button>
+        <!-- Input file oculto para manejar la importación del archivo JSON -->
+        <input type="file" id="input-importar" accept=".json" style="display: none;">
+    </footer>
+
+    <!-- Enlazamos la lógica en JavaScript al final -->
+    <script src="app.js" defer></script>
+</body>
+</html>
